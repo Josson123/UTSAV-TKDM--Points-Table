@@ -1,0 +1,351 @@
+<?php
+// Database configuration
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "utsavtkdm";
+
+try {
+    // Create connection
+    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Fetch all units
+    $units_query = "SELECT unit_slno, unit_name FROM units ORDER BY unit_slno";
+    $units_stmt = $pdo->prepare($units_query);
+    $units_stmt->execute();
+    $units = $units_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch all events
+    $events_query = "SELECT Event_slno, Event_name FROM events ORDER BY Event_slno";
+    $events_stmt = $pdo->prepare($events_query);
+    $events_stmt->execute();
+    $events = $events_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fetch all points data
+    $points_query = "SELECT unit_slno, Event_slno, Points FROM points";
+    $points_stmt = $pdo->prepare($points_query);
+    $points_stmt->execute();
+    $points_data = $points_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Create a points lookup array for quick access
+    $points_lookup = array();
+    foreach ($points_data as $point) {
+        $points_lookup[$point['unit_slno']][$point['Event_slno']] = $point['Points'];
+    }
+
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+
+    <!-- ===== CSS ===== -->
+    <link rel="stylesheet" href="style.css">
+        
+    <!-- ===== Boxicons CSS ===== -->
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+
+    <title>Responsive Navigation Menu Bar</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utsav TKDM Points Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .points-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        .points-table th,
+        .points-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .points-table th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .points-table .unit-name {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: left;
+            padding-left: 12px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        
+        .points-table .total-column {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+        
+        .points-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .points-table tbody tr:hover {
+            background-color: #f0f8ff;
+        }
+        
+        .points-table .event-header {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            height: 150px;
+            min-width: 40px;
+            font-size: 11px;
+        }
+        
+        .points-table input[type="number"] {
+            width: 50px;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .points-table input[type="number"]:focus {
+            background-color: #fff3cd;
+            outline: 2px solid #ffc107;
+        }
+        
+        .summary {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .summary-stats {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-bar">
+            <i class='bx bx-menu sidebarOpen' ></i>
+            <span class="logo navLogo"><a href="#">UTSAV-TKDM Yuvadeepti Kalolsavam</a></span>
+
+            <div class="menu">
+                <div class="logo-toggle">
+                    <span class="logo"><a href="#">UTSAV</a></span>
+                    <i class='bx bx-x siderbarClose'></i>
+                </div>
+
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Appeals</a></li>
+                    <li><a href="#"></a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="darkLight-searchBox">
+                <div class="dark-light">
+                    <i class='bx bx-moon moon'></i>
+                    <i class='bx bx-sun sun'></i>
+                </div>
+
+                <div class="searchBox">
+                   <div class="searchToggle">
+                    <i class='bx bx-x cancel'></i>
+                    <i class='bx bx-search search'></i>
+                   </div>
+
+                    <div class="search-field">
+                        <input type="text" placeholder="Search...">
+                        <i class='bx bx-search'></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Utsav TKDM - Points Distribution Table</h1>
+        
+        <form method="POST" action="">
+            <table class="points-table">
+                <thead>
+                    <tr>
+                        <th style="position: sticky; left: 0; z-index: 15;">Unit Name</th>
+                        <?php foreach ($events as $event): ?>
+                            <th class="event-header"><?php echo htmlspecialchars($event['Event_name']); ?></th>
+                        <?php endforeach; ?>
+                        <th class="total-column">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($units as $unit): ?>
+                        <tr>
+                            <td class="unit-name"><?php echo htmlspecialchars($unit['unit_name']); ?></td>
+                            <?php 
+                            $unit_total = 0;
+                            foreach ($events as $event): 
+                                $current_points = isset($points_lookup[$unit['unit_slno']][$event['Event_slno']]) 
+                                                ? $points_lookup[$unit['unit_slno']][$event['Event_slno']] 
+                                                : 0;
+                                $unit_total += $current_points;
+                            ?>
+                                <td>
+                                    <input type="number" 
+                                           name="points[<?php echo $unit['unit_slno']; ?>][<?php echo $event['Event_slno']; ?>]" 
+                                           value="<?php echo $current_points; ?>" 
+                                           min="0" 
+                                           max="999">
+                                </td>
+                            <?php endforeach; ?>
+                            <td class="total-column">
+                                <strong><?php echo $unit_total; ?></strong>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            
+            <div class="summary">
+                <div class="summary-stats">
+                    <strong>Statistics:</strong><br>
+                    Total Units: <?php echo count($units); ?><br>
+                    Total Events: <?php echo count($events); ?><br>
+                    Total Cells: <?php echo count($units) * count($events); ?>
+                </div>
+                
+                <button type="submit" name="update_points" class="btn">Update Points</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Auto-calculate totals when points are updated
+        document.addEventListener('input', function(e) {
+            if (e.target.type === 'number') {
+                calculateRowTotal(e.target);
+            }
+        });
+
+        function calculateRowTotal(input) {
+            const row = input.closest('tr');
+            const inputs = row.querySelectorAll('input[type="number"]');
+            let total = 0;
+            
+            inputs.forEach(function(inp) {
+                const value = parseInt(inp.value) || 0;
+                total += value;
+            });
+            
+            const totalCell = row.querySelector('.total-column strong');
+            totalCell.textContent = total;
+        }
+
+        // Add some visual feedback for form submission
+        document.querySelector('form').addEventListener('submit', function() {
+            const btn = document.querySelector('.btn');
+            btn.textContent = 'Updating...';
+            btn.disabled = true;
+        });
+    </script>
+    <script src="script.js"></script>
+  
+</body>
+</html>
+
+<?php
+// Handle form submission to update points
+if (isset($_POST['update_points']) && isset($_POST['points'])) {
+    try {
+        // Begin transaction
+        $pdo->beginTransaction();
+        
+        // Clear existing points
+        $clear_query = "DELETE FROM points";
+        $pdo->exec($clear_query);
+        
+        // Insert new points
+        $insert_query = "INSERT INTO points (unit_slno, Event_slno, Points) VALUES (?, ?, ?)";
+        $insert_stmt = $pdo->prepare($insert_query);
+        
+        foreach ($_POST['points'] as $unit_id => $events_points) {
+            foreach ($events_points as $event_id => $points) {
+                if ($points > 0) { // Only insert non-zero points
+                    $insert_stmt->execute([$unit_id, $event_id, $points]);
+                }
+            }
+        }
+        
+        // Update total points for each unit
+        $update_totals_query = "UPDATE units u SET total_points = (
+            SELECT COALESCE(SUM(p.Points), 0) 
+            FROM points p 
+            WHERE p.unit_slno = u.unit_slno
+        )";
+        $pdo->exec($update_totals_query);
+        
+        // Commit transaction
+        $pdo->commit();
+        
+        echo "<script>
+            alert('Points updated successfully!');
+            window.location.reload();
+        </script>";
+        
+    } catch (Exception $e) {
+        // Rollback transaction on error
+        $pdo->rollback();
+        echo "<script>alert('Error updating points: " . addslashes($e->getMessage()) . "');</script>";
+    }
+}
+?>
