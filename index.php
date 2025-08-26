@@ -1,9 +1,10 @@
 <?php
 // Database configuration
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "utsavtkdm";
+$host = getenv('DB_HOST') ?: 'db';  // IMPORTANT: use 'db' not 'localhost'
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: 'example';
+$db   = getenv('DB_NAME') ?: 'utsav_db';
+
 
 try {
     // Create connection
