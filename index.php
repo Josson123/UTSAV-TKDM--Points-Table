@@ -8,8 +8,9 @@ $db   = getenv('DB_NAME') ?: 'utsav_db';
 
 try {
     // Create connection
-    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    echo "Connected successfully!";
 
     // Fetch all units
     $units_query = "SELECT unit_slno, unit_name FROM units ORDER BY unit_slno";
@@ -35,7 +36,7 @@ try {
         $points_lookup[$point['unit_slno']][$point['Event_slno']] = $point['Points'];
     }
 
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
 }
 ?>
