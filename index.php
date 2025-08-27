@@ -1,6 +1,6 @@
 <?php
 // Database configuration
-$host = getenv('DB_HOST') ?: 'db';
+$host = getenv('DB_HOST') ?: 'utsav-db';
 $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: 'example';
 $db   = getenv('DB_NAME') ?: 'utsav_db';
@@ -10,7 +10,7 @@ try {
     // Create connection
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-     echo "Database connected!"; 
+    echo "Connected to MySQL successfully!";
 
     // Fetch all units
     $units_query = "SELECT unit_slno, unit_name FROM units ORDER BY unit_slno";
