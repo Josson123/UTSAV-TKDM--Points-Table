@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: utsav-web
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_HOST
+        value: utsav-db
+      - key: DB_USER
+        value: root
+      - key: DB_PASS
+        value: example
+      - key: DB_NAME
+        value: utsav_db
+
+  - type: private_service
+    name: utsav-db
+    env: docker
+    plan: free
+    dockerfilePath: ./mysql.Dockerfile
